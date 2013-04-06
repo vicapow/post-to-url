@@ -1,22 +1,32 @@
-module.exports = function post_to_url(path, params, method) {
-    method = method || "post"; // Set method to post by default, if not specified.
+/**
+  * taken largely from this stackoverflow discussion:
+  * http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
+  */
 
-    // The rest of this code assumes you are not using a library.
-    // It can be made less wordy if you use one.
+function postToUrl(path, params, method) {
+    
+    method = method || "post";
+    path = path || window.location.href;
+
     var form = document.createElement("form");
+
+    //Move the submit function to another variable
+    //so that it doesn't get overwritten.
+    var submitFunc = form.submit;
+
     form.setAttribute("method", method);
     form.setAttribute("action", path);
 
     for(var key in params) {
-        if(params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", key);
+        hiddenField.setAttribute("value", params[key]);
 
-            form.appendChild(hiddenField);
-         }
+        form.appendChild(hiddenField);
     }
     document.body.appendChild(form);
-    form.submit();
+    submitFunc.call(form); //Call the renamed function.
 }
+
+module.exports = postToUrl;
